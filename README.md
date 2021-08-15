@@ -16,7 +16,7 @@ This repository contains code and instructions used in **Join Ordering Simplifie
 
 **Prerequisites -** 
 The following python packages are required <br />
-```collections, operator, termcolor```
+```collections, operator```
 
 **Step 1 :** Run join ordering simplified alorithm to obtain the plans. <br />
 ``` python3 join-orderingSimplified.py ```  <br />

@@ -108,6 +108,6 @@
 31c : mi_idx it2 t (mc cn) (mk k) (mi it1) (ci n)
 32a : mk k t1 ml lt t2
 32b : mk k t1 ml lt t2
-33a : ml lt t1 kt1 t2 kt2 (mi_idx1 it1) (mi_idx2 it2) (mc1 cn1) (mc2 cn2)
-33b : ml lt t1 kt1 t2 kt2 (mi_idx1 it1) (mi_idx2 it2) (mc1 cn1) (mc2 cn2)
-33c : ml lt t1 kt1 t2 kt2 (mi_idx1 it1) (mi_idx2 it2) (mc1 cn1) (mc2 cn2)
+33a : ml lt t1 kt1 t2 kt2 (mi_idx1 it1) (mi_idx2 it2) (mc2 cn2) (mc1 cn1)
+33b : ml lt t1 kt1 t2 kt2 (mi_idx1 it1) (mi_idx2 it2) (mc2 cn2) (mc1 cn1)
+33c : ml lt t1 kt1 t2 kt2 (mi_idx1 it1) (mi_idx2 it2) (mc2 cn2) (mc1 cn1)

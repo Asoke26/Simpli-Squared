@@ -1,5 +1,5 @@
 import os,sys
-from termcolor import colored
+# from termcolor import colored
 from operator import itemgetter
 from collections import OrderedDict
 
@@ -317,5 +317,5 @@ for file in files:
     join_order = plan_validation(join_order,complete_join_graph)
     join_order = file+" : "+join_order
     plan_file.write(join_order+'\n')
-    print(colored(join_order,'green'))
+    print(join_order,'green')
 plan_file.close()

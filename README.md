@@ -1,6 +1,7 @@
-# Join Ordering Simplified
+# Simpli-Squared
 
-This repository contains code and instructions used in **Join Ordering Simplified paper**.
+This repository contains code and instructions used in **Simpli-Squared: A Very Simple Yet Unexpectedly Powerful
+Join Ordering Algorithm**.
 
 ## Files
 

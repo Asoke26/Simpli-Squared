@@ -12,14 +12,15 @@ Join Ordering Algorithm**.
 **2. sql-generator.py :** This code transforms the output plans from ```plans.txt``` into sql. <br />
      - Input : JOB(Join Ordering Benchmark) queries and ```plans.txt``` file. <br />
      - Output : SQL plans which respects join orders. <br />
-     
-## How to Run ?
-Create a database using 
+
+
 **Prerequisites -** 
 The following softwares are required to run experiments <br />
 - ```collections, operator``` (Python Packages)
 - PostgreSQL 14.2.
 
+
+## How to Run ?
 **Step 1 :** Create a database using imdb dataset. Dataset used in paper can be found in http://homepages.cwi.nl/~boncz/job/imdb.tgz .
 **Step 2 :** Run join ordering simplified alorithm to obtain the plans. <br />
 ``` python3 join-orderingSimplified.py ```  <br />

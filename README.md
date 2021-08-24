@@ -14,14 +14,16 @@ Join Ordering Algorithm**.
      - Output : SQL plans which respects join orders. <br />
      
 ## How to Run ?
-
+Create a database using 
 **Prerequisites -** 
-The following python packages are required <br />
-```collections, operator```
+The following softwares are required to run experiments <br />
+- ```collections, operator``` (Python Packages)
+- PostgreSQL 14.2.
 
-**Step 1 :** Run join ordering simplified alorithm to obtain the plans. <br />
+**Step 1 :** Create a database using imdb dataset. Dataset used in paper can be found in http://homepages.cwi.nl/~boncz/job/imdb.tgz .
+**Step 2 :** Run join ordering simplified alorithm to obtain the plans. <br />
 ``` python3 join-orderingSimplified.py ```  <br />
-**Step 2 :** Run SQL generator to translate the plans from step 1 into SQL queries. <br />
+**Step 3 :** Run SQL generator to translate the plans from step 1 into SQL queries. <br />
 ``` python3 sql-generator.py ```
 
 

@@ -46,5 +46,6 @@ join_collapse_limit = 1 [To prevent reordering join order]
 
 System requires a restart to re-initialize these variables.
 
-* Schema with referential integrity can be found here. Data should be inserted following dependency.   
+Note :
+Schema with referential integrity can be found here. Data should be inserted following dependency.   
 https://github.com/Asoke26/Simpli-Squared/blob/main/join-order-benchmark/schema-with-referential-integrity.sql

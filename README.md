@@ -11,7 +11,7 @@ Join Ordering Algorithm**.
 
 **2. sql-generator.py :** This code transforms the output plans from ```plans.txt``` into sql. <br />
      - Input : JOB(Join Ordering Benchmark) queries and ```plans.txt``` file. <br />
-     - Output : SQL plans which respects join orders. <br />
+     - Output : SQL query in explicit representation. <br />
 
 
 **Prerequisites -** 

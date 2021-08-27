@@ -21,7 +21,7 @@ Join Ordering Algorithm**.
 
 
 ## How to Run ?
-**Step 1 :** Create a database using imdb dataset. Step-by-setp instructions can be found here(https://github.com/gregrahn/join-order-benchmark). Dataset used in paper can be found in http://homepages.cwi.nl/~boncz/job/imdb.tgz . <br />
+**Step 1 :** Create a database using imdb dataset. Step-by-step instructions can be found here(https://github.com/gregrahn/join-order-benchmark). Dataset used in paper can be found in http://homepages.cwi.nl/~boncz/job/imdb.tgz . <br />
 **Step 2 :** Run join ordering simplified alorithm to obtain the plans. <br />
 ``` python3 join-orderingSimplified.py ```  <br />
 **Step 3 :** Run SQL generator to translate the plans from step 1 into SQL queries. <br />

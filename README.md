@@ -38,7 +38,7 @@ shared_buffers = 128 GB
 work_mem = 128 GB
 effective_cache_size = 128 GB
 geqo_threshold = 18
-cpu_tuple_cost = 0.1,1
+cpu_tuple_cost = 0.01,0.1,1
 force_parallel_mode = on
 from_collapse_limit = 1 [To prevent sub-query merging]
 join_collapse_limit = 1 [To prevent reordering join order]
@@ -47,5 +47,5 @@ join_collapse_limit = 1 [To prevent reordering join order]
 System requires a restart to re-initialize these variables.
 
 Note :
-Schema with referential integrity can be found here. Data should be inserted following dependency.   
+In experiemnts, we use imdb schema with referential integrity which can be found here. Data should be inserted following dependency matric.   
 https://github.com/Asoke26/Simpli-Squared/blob/main/join-order-benchmark/schema-with-referential-integrity.sql

@@ -46,6 +46,6 @@ join_collapse_limit = 1 [To prevent reordering join order]
 
 System requires a restart to re-initialize these variables.
 
-Note :
+**Note** :
 In experiemnts, we use imdb schema with referential integrity which can be found here. Data should be inserted following dependency matric.   
 _https://github.com/Asoke26/Simpli-Squared/blob/main/join-order-benchmark/schema-with-referential-integrity.sql_

@@ -31,7 +31,7 @@ The reported result in paper [figure 3] are obtained by running these queries in
 
 
 ## Tuning PostgreSQL
-We change below parameters in PostgreSQL for our experiemnts. They can be found '''/usr/local/pgsql/data/postgresql.conf''' (default location unless set otherwise during installation)
+We change below parameters in PostgreSQL for our experiemnts. They can be found ```/usr/local/pgsql/data/postgresql.conf``` (default location unless set otherwise during installation)
 
 ```
 shared_buffers = 128 GB

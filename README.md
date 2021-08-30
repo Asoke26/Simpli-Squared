@@ -48,4 +48,4 @@ System requires a restart to re-initialize these variables.
 
 Note :
 In experiemnts, we use imdb schema with referential integrity which can be found here. Data should be inserted following dependency matric.   
-https://github.com/Asoke26/Simpli-Squared/blob/main/join-order-benchmark/schema-with-referential-integrity.sql
+_https://github.com/Asoke26/Simpli-Squared/blob/main/join-order-benchmark/schema-with-referential-integrity.sql_

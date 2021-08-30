@@ -7,7 +7,7 @@ Join Ordering Algorithm**.
 
 **1. join-orderingSimplified.py :**  This file has the code for the join ordering simplified algorithm. <br />
      - Input : JOB(Join Ordering Benchmark) queries. <br />
-     - Output : plans in ```plans.txt``` file. <br />
+     - Output : plans in ```plans.txt``` file. Sample plan file can be found here _https://github.com/Asoke26/Simpli-Squared/blob/main/plans.txt_ <br />
 
 **2. sql-generator.py :** This code transforms the output plans from ```plans.txt``` into sql. <br />
      - Input : JOB(Join Ordering Benchmark) queries and ```plans.txt``` file. <br />
@@ -21,12 +21,12 @@ Join Ordering Algorithm**.
 
 
 ## How to Run ?
-**Step 1 :** Create a database using imdb dataset. Step-by-step instructions can be found here(https://github.com/gregrahn/join-order-benchmark). Dataset used in paper can be found in http://homepages.cwi.nl/~boncz/job/imdb.tgz . <br />
+**Step 1 :** Create a database using imdb dataset. Step-by-step instructions can be found here(_https://github.com/gregrahn/join-order-benchmark_). Dataset used in paper can be found in _http://homepages.cwi.nl/~boncz/job/imdb.tgz_ . <br />
 **Step 2 :** Run join ordering simplified alorithm to obtain the plans. <br />
 ``` python3 join-orderingSimplified.py ```  <br />
 **Step 3 :** Run SQL generator to translate the plans from step 1 into SQL queries. <br />
 ``` python3 sql-generator.py ``` <br />
-The reported result in paper [figure 3-5] are obtained by running these queries in PostgreSQL database. 
+The reported result in paper [figure 3] are obtained by running these queries in PostgreSQL database. 
 
 
 

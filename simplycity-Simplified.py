@@ -1,7 +1,8 @@
 import os,sys
-# from termcolor import colored
+from termcolor import colored
 from operator import itemgetter
 from collections import OrderedDict
+import copy
 
 # Number of Total Tuples 
 TT_dict = {"aka_name":901343,"aka_title":361472,"cast_info":36244344,"char_name":3140339,"company_name":234997, \
@@ -17,6 +18,42 @@ def TT_sort(_tbls,_AS_mapping,_order):
     
   tbl_tuples_sorted = OrderedDict(sorted(tbl_tuples.items(), key=itemgetter(1) , reverse= _order))
   return list(tbl_tuples_sorted.keys())
+
+# Sort a list based on Total number tuples and Join graph
+def TT_sort_g(_tbls,_AS_mapping,_order,_FK_join_graph):
+  tbl_tuples = dict()
+  for tbl in _tbls:
+    tbl_tuples[tbl] = TT_dict[_AS_mapping[tbl]] 
+
+  tbl_tuples_sorted = OrderedDict(sorted(tbl_tuples.items(), key=itemgetter(1) , reverse= _order)) 
+  final_order = []
+  already_joined = []
+  not_joined_yet = list(tbl_tuples_sorted.keys())
+  cand = not_joined_yet[0]
+  already_joined.append(cand)
+  final_order.append(cand)
+  not_joined_yet.remove(cand)
+
+  i = 0
+  connected = 0
+  while(len(not_joined_yet)!=0):
+    cand = not_joined_yet[i]
+    for tbl in already_joined:
+      if cand in _FK_join_graph[tbl]:
+        already_joined.append(cand)
+        final_order.append(cand)
+        not_joined_yet.remove(cand)
+        i = 0
+        connected = 1
+        break
+      else:
+        connected = 0
+    if connected == 0:
+      i+=1
+
+
+
+  return final_order
 
 def build_join_graph():
   for join_pred in join_predicates:
@@ -66,11 +103,13 @@ def plan_validation(plan,complete_join_graph):
   subquery = []
   subquery_str = ""
   s = 1
+  subq_f = 0
   for tbl in plan:
     if '(' in tbl:
       subquery_str += tbl+" "
       tbl = tbl.replace('(','')
       subquery.append(tbl)
+      subq_f = 1
     elif ')' in tbl:
       subquery_str += tbl
       tbl = tbl.replace(')','')
@@ -80,13 +119,14 @@ def plan_validation(plan,complete_join_graph):
       subquery.clear()
       subquery_str = ""
       s += 1
-  # print("New PLAN ", plan_copy)
-  # print("subquery dict ",subquery_dict)
+      subq_f = 0
+    elif subq_f == 1:
+      subquery_str += tbl + " "
+      subquery.append(tbl)
 
   visited = []
   plan_copy = plan_copy.replace("  "," ")
   not_visited = plan_copy.strip().split(' ')
-  # print("Not visited ",not_visited)
   visited.append(not_visited[0])
   not_visited.remove(visited[0])
   connections = []
@@ -95,17 +135,15 @@ def plan_validation(plan,complete_join_graph):
   while (len(not_visited) != 0):
     cur = not_visited[0]
     if 'S' in cur:
-      cand1 = subquery_dict[cur][0]
-      cand2 = subquery_dict[cur][1]
-      connections.extend(complete_join_graph[cand1])
-      connections.extend(complete_join_graph[cand2])
+      for candS in subquery_dict[cur]:
+        connections.extend(complete_join_graph[candS])
     else:
       connections.extend(complete_join_graph[cur])
 
     if common_item(visited,connections) == True:
       if 'S' in cur:
-        visited.append(cand1)
-        visited.append(cand2)
+        for candS in subquery_dict[cur]:
+          visited.append(candS)
         order.append(cur)
       else:
         visited.append(cur)
@@ -113,22 +151,19 @@ def plan_validation(plan,complete_join_graph):
       not_visited.remove(cur)
       connections.clear()
     else:
-      # print("No FK connections found")
       s = i + 1
       while s < len(not_visited):
         connections.clear()
         cand = not_visited[s]
         if 'S' in cand:
-          cand1 = subquery_dict[cand][0]
-          cand2 = subquery_dict[cand][1]
-          connections.extend(complete_join_graph[cand1])
-          connections.extend(complete_join_graph[cand2])
+          for candS in subquery_dict[cur]:
+            connections.extend(complete_join_graph[candS])
         else:
           connections.extend(complete_join_graph[cand])
         if common_item(visited,connections) == True:
           if 'S' in cur:
-            visited.append(cand1)
-            visited.append(cand2)
+            for candS in subquery_dict[cur]:
+              visited.append(candS)
             order.append(cand)
           else:
             visited.append(cand)
@@ -140,7 +175,10 @@ def plan_validation(plan,complete_join_graph):
           s += 1
   order = ' '.join(order)
   for key,val in subquery_dict.items():
-    sub = "("+val[0]+" "+val[1]+")"
+    sub = '('
+    for tbl in val:
+      sub += tbl+' '
+    sub = sub[:-1]+')'
     order = order.replace(key,sub)
   return order
 
@@ -149,20 +187,20 @@ def plan_validation(plan,complete_join_graph):
 
 PATH = "join-order-benchmark/"
 plan_file = open('plans.txt','w')
-# files = os.listdir(PATH)
-files = ['1a','1b','1c','1d','2a','2b','2c','2d','3a','3b','3c','4a','4b','4c','5a','5b','5c','6a','6b','6c','6d','6e','6f', \
-        '7a','7b','7c','8a','8b','8c','8d','9a','9b','9c','9d','10a','10b','10c','11a','11b','11c','11d','12a','12b','12c', \
-        '13a','13b','13c','13d','14a','14b','14c','15a','15b','15c','15d','16a','16b','16c','16d','17a','17b','17c','17d', \
-        '17e','17f','18a','18b','18c','19a','19b','19c','19d','20a','20b','20c','21a','21b','21c','22a','22b','22c','22d', \
-        '23a','23b','23c','24a','24b','25a','25b','25c','26a','26b','26c','27a','27b','27c','28a','28b','28c','29a','29b', \
-        '29c','30a','30b','30c','31a','31b','31c','32a','32b','33a','33b','33c']
+
+files = [     
+         '1a','1b','1c','1d','2a','2b','2c','2d','3a','3b','3c','4a','4b','4c','5a','5b','5c','6a','6b','6c','6d','6e','6f', \
+         '7a','7b','7c','8a','8b','8c','8d','9a','9b','9c','9d','10a','10b','10c','11a','11b','11c','11d','12a','12b','12c', \
+         '13a','13b','13c','13d','14a','14b','14c','15a','15b','15c','15d','16a','16b','16c','16d','17a','17b','17c','17d', \
+         '17e','17f','18a','18b','18c','19a','19b','19c','19d','20a','20b','20c','21a','21b','21c','22a','22b','22c','22d', \
+         '23a','23b','23c','24a','24b','25a','25b','25c','26a','26b','26c','27a','27b','27c','28a','28b','28c','29a','29b', \
+         '29c','30a','30b','30c','31a','31b','31c','32a','32b','33a','33b','33c'
+        ]
+no_tbls = 0
 for file in files:
   # Reading the query
   query = open(PATH+file+'.sql').read()
-  # print(query)
-  # print(query)
 
-  # Parse the query and retrive join predicates
   join_predicates = []
   AS_mapping = dict()
 
@@ -183,6 +221,7 @@ for file in files:
     if '.' in left and '.' in right and 'id' in predicate:
       join_predicates.append(predicate.strip())
 
+  no_tbls = len(AS_mapping)
 
   # Get FK-FK joins and join graphs for FK keys
   FK_FK = []
@@ -267,16 +306,14 @@ for file in files:
 
 
     # Sort FK-FK based on total tuples order desc.
-    FK_FK = TT_sort(FK_FK,AS_mapping,False)
+    FK_FK = TT_sort_g(FK_FK,AS_mapping,False,FK_join_graph)
     for key,val in FK_join_graph.items():
       all_FK_join_cands.extend(val)
 
-    # print(FK_join_graph)
-    # print(set(all_FK_join_cands))
 
     for key,val in FK_join_graph.items():
       FK_join_graph[key] = TT_sort(val,AS_mapping,False)
-    # print(FK_join_graph)
+
     #  Enumerate over FK-FK :
     #   a) sort FK key graph on total tuples order asce. {ci : {t,n,mk},mk:{k,t,ci}}
     #   b) Enumerate over FK key graph:
@@ -294,9 +331,9 @@ for file in files:
     # Enumerate over FK key graph:
     for FK in FK_FK:
       visited[FK] = True
-      join_candidates = FK_join_graph[FK].copy() #TT_sort(FK_join_graph[FK],AS_mapping,False)
+      join_candidates = FK_join_graph[FK].copy() 
       if not join_candidates:
-        join_order += str(FK)+" "
+        join_order += ' '+str(FK)+" "
         continue
 
       if FK != FK_FK[0]:
@@ -304,18 +341,25 @@ for file in files:
         subqry_flag = True
 
       i = 0
-      for tbl in join_candidates:
-        if tbl not in FK_FK and visited[tbl]==False:
-          visited[tbl] = True
-          FK_join_graph = update_join_graph(tbl,FK_join_graph) 
-          if i==0 and subqry_flag==True:
-            join_order += " "+str(tbl)+lonely_tbl(complete_join_graph[tbl],all_FK_join_cands)+') '
-            subqry_flag = False
-          else:
+      if subqry_flag == True:
+        for tbl in join_candidates:
+          if tbl not in FK_FK and visited[tbl] == False:
+            visited[tbl] = True
+            FK_join_graph = update_join_graph(tbl, FK_join_graph)
+            join_order += " " + str(tbl) + lonely_tbl(complete_join_graph[tbl], all_FK_join_cands)+' '
+        join_order = join_order[:-1]+')'
+        subqry_flag = False
+      else:
+        for tbl in join_candidates:
+          if tbl not in FK_FK and visited[tbl]==False:
+            visited[tbl] = True
+            FK_join_graph = update_join_graph(tbl,FK_join_graph)
             join_order += " "+str(tbl)+lonely_tbl(complete_join_graph[tbl],all_FK_join_cands)+" "
 
-    join_order = plan_validation(join_order,complete_join_graph)
+    join_order = join_order.replace('  ',' ').replace(")(",") (")
+    join_order_c = copy.copy(join_order)
+
     join_order = file+" : "+join_order
     plan_file.write(join_order+'\n')
-    print(join_order,'green')
+    print(colored(join_order,'green'))
 plan_file.close()

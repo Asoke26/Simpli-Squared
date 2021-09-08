@@ -2,7 +2,7 @@ import sys,os
 
 
 # Retrive plans - OUTPUT - plan_dict
-PLAN_PATH = "/home/ad26/Projects/MapD/SimplicityDoneRight/script-results/simpli-squared.plan"
+PLAN_PATH = "plans.txt"
 plans = open(PLAN_PATH,'r').readlines()
 plan_dict = dict()
 
@@ -18,8 +18,8 @@ for key,val in plan_dict.items():
 
 # Parse Queries for SELECT and JOIN CONDITIONS - OUTPUT - SELECT_MAPPING, JOIN_MAPPING
 
-QUERY_PATH = "/home/ad26/Projects/MapD/SimplicityDoneRight/JOB-Queries/implicit/"
-EXPLICIT_PATH = "/home/ad26/Projects/MapD/SimplicityDoneRight/JOB-Queries/explicit-simpli-squared-2/"
+QUERY_PATH = "join-order-benchmark/"
+EXPLICIT_PATH = "output-queries/"
 files = [
 	# '8a'
 	'1a','1b','1c','1d','2a','2b','2c','2d','3a','3b','3c','4a','4b','4c','5a','5b','5c','6a','6b','6c','6d','6e','6f', \
@@ -68,7 +68,6 @@ for file in files:
 
 			if '=' not in predicate:
 				key1 = predicate.split('.')[0].replace('(','')
-				# print("SELECT_MAPPING ",predicate,key1)
 				SELECT_MAPPING[key1].append(predicate)
 				continue
 			left = predicate.split('=')[0].strip()
@@ -82,22 +81,12 @@ for file in files:
 				key2 = predicate.split('.')[0]
 				if '(' in key2:
 					key2 = key2.replace('(','')
-				# print("ELSE ",predicate,key2)
 				SELECT_MAPPING[key2].append(predicate)
 
-	# for key,val in SELECT_MAPPING.items():
-	# 	print(key,val)
-	# print("\n\n")
-	# for key,val in JOIN_MAPPING.items():
-	# 	print(key,val)
-###############################################################################################
 
 	# Build subquery
 	subquery_col_map = dict()
 	def update_join_map(_tbls,sub_no):
-		# print("-------update_join_map and Cleaning ",_tbls)
-
-		# Cleaning self joins in sub-query
 		for tbl in _tbls:
 			for pred in JOIN_MAPPING[tbl]:
 				left = pred.split('=')[0].strip()
@@ -107,25 +96,20 @@ for file in files:
 				if left_tbl in _tbls and right_tbl in _tbls:
 					JOIN_MAPPING[right_tbl].remove(pred)
 					JOIN_MAPPING[left_tbl].remove(pred)
-		# for key,val in JOIN_MAPPING.items():
-		# 		print(key,val)
+
 
 		for tbl in _tbls:
-			# print("###################### "+tbl+" ########################")
 			for pred in JOIN_MAPPING[tbl]:
 				pred_copy = pred
 				left = pred.split('=')[0].strip()
 				right = pred.split('=')[1].strip()
-				# print("-----######",pred)
 				if left in subquery_col_map.keys():
 					pred = pred.replace(left,subquery_col_map[left])
-					# print('# ',pred)
 					right_tbl = right.split('.')[0]
 					JOIN_MAPPING[right_tbl].remove(pred_copy)
 					JOIN_MAPPING[right_tbl].append(pred)
 					JOIN_MAPPING[sub_no].append(pred)
 				elif right in subquery_col_map.keys():
-					# print('# ',pred)
 					pred = pred.replace(right,subquery_col_map[right])
 					left_tbl = left.split('.')[0]
 					JOIN_MAPPING[left_tbl].remove(pred_copy)
@@ -139,7 +123,6 @@ for file in files:
 	def expose_columns(_tbls,sub_no):
 		columns_visited = []
 		select_stmt = ""
-		# print("expose_columns ",_tbls)
 		for tbl in _tbls:
 			for pred in JOIN_MAPPING[tbl]:
 				left = pred.split('=')[0].strip()
@@ -148,26 +131,18 @@ for file in files:
 				right_tbl = right.split('.')[0].strip()
 				left_attr = left.split('.')[1].strip()
 				right_attr = right.split('.')[1].strip()
-				# print("--- ",left_tbl,left_attr,"--- ",right_tbl,right_attr)
-				# print("subquery_col_map ",subquery_col_map)
 
 				if left_tbl == tbl and left not in columns_visited and right_tbl not in _tbls:
-					# print("Entered ### ")
 					select_stmt += left+' AS '+left_tbl+'_'+left_attr+','
 					columns_visited.append(left)
 					subquery_col_map[left] = sub_no+'.'+left_tbl+'_'+left_attr
 				elif right_tbl == tbl and right not in columns_visited and left_tbl not in _tbls:
-					# print("Entered ### ")
 					select_stmt += right+' AS '+right_tbl+'_'+right_attr+','
 					columns_visited.append(right)
 					subquery_col_map[right] = sub_no+'.'+right_tbl+'_'+right_attr
-				# print("E select_stmt ",select_stmt)
-				# print("E subquery_col_map ",subquery_col_map)
-		# print("select_stmt ",select_stmt)
 		return select_stmt
 
 	def build_subquery(_tbls,sub_no):
-		# print("Build Subquery ",_tbls)
 
 		visited = []
 		not_visited = _tbls.copy()
@@ -176,7 +151,6 @@ for file in files:
 		i = 0
 		first_tbl_flag = True
 		sql_stmt = " FROM "+AS_MAPPING[visited[0]]+" AS "+visited[0]+"\n"
-		# print(sql_stmt)
 		while(len(not_visited) != 0):
 			tbl = not_visited[i]
 			sql_stmt += ' join '
@@ -188,7 +162,6 @@ for file in files:
 			for pred in SELECT_MAPPING[tbl]:
 				sql_stmt += pred+' AND '
 
-			# print("1 SQL STMT ### ",sql_stmt)
 			for pred in JOIN_MAPPING[tbl]:
 				pred = pred.strip()
 				left = pred.split('=')[0].strip()
@@ -200,8 +173,6 @@ for file in files:
 			sql_stmt = sql_stmt[:-4]+')'
 			visited.append(tbl)
 			not_visited.remove(tbl)
-		# print(sql_stmt)
-
 
 
 		columns = expose_columns(_tbls,sub_no)[:-1]
@@ -224,7 +195,6 @@ for file in files:
 	subquery_str = ""
 	sub_flag = 0
 	for tbl in qry_plan:
-		# print(tbl)
 		if '(' in tbl:
 			subquery_str += tbl+" "
 			tbl = tbl.replace('(','')
@@ -243,7 +213,6 @@ for file in files:
 		elif sub_flag == 1:
 			subquery_str += tbl+" "
 			subquery.append(tbl)
-	# print("subquery ",subquery_dict)
 
 	for key,val in subquery_dict.items():
 		JOIN_MAPPING[key] = []
@@ -274,7 +243,6 @@ for file in files:
 			for pred in SELECT_MAPPING[tbl]:
 				sql_stmt += pred+' AND '
 
-		# print("1 SQL STMT ### ",sql_stmt)
 		for pred in JOIN_MAPPING[tbl]:
 			pred = pred.strip()
 			left = pred.split('=')[0].strip()
@@ -286,8 +254,6 @@ for file in files:
 		sql_stmt = sql_stmt[:-4]+') \n'
 		visited.append(tbl)
 		not_visited.remove(tbl)
-		# print("2 SQL STMT ### ",sql_stmt)
-		# i += 1
 	sql_stmt = sql_stmt.strip()+';'
 	print(sql_stmt)
 	w_f = open(EXPLICIT_PATH+file+'.sql','w')
